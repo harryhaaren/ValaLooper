@@ -24,7 +24,7 @@ def configure(conf):
 	conf.env.append_value('CFLAGS', ['-O2', '-g'])
 	conf.env.append_value('VALAFLAGS', '--thread -X -Wall')
 	
-	conf.check_cfg(package='glib-2.0', uselib_store='GLIB', atleast_version='2.10.0', mandatory=1, args='--cflags --libs')
+	#conf.check_cfg(package='glib-2.0', uselib_store='GLIB', atleast_version='2.10.0', mandatory=1, args='--cflags --libs')
 	conf.check_cfg(package='gtk+-2.0', uselib_store='GTK', atleast_version='2.10.0', mandatory=1, args='--cflags --libs')
 	conf.check_cfg(package='jack', uselib_store='JACK', atleast_version='0.100', mandatory=1, args='--cflags --libs')
 	conf.check_cfg(package='sndfile', uselib_store='SNDFILE', mandatory=1, args='--cflags --libs')
@@ -42,6 +42,14 @@ def build(bld):
 	
 	bld.new_task_gen(
 		features = 'cc cstaticlib',
+		packages = 'jack gtk+-2.0',
+		target = 'jackclient',
+		source = 'jack.vala',
+		uselib = 'JACK GTK',
+		)
+	
+	bld.new_task_gen(
+		features = 'cc cstaticlib',
 		packages = 'gtk+-2.0',
 		target = 'waveview',
 		source = 'waveview.vala',
@@ -55,7 +63,7 @@ def build(bld):
 		includes= '/usr/include',
 		source = 'main.vala',
 		uselib = 'GTK GLIB JACK SNDFILE',
-		uselib_local = 'sample waveview',
+		uselib_local = 'sample waveview jackclient',
 		)
 
 def shutdown():
