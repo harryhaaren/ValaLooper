@@ -2,7 +2,7 @@
 using Audio;
 using Widget;
 
-Jack.Client? client;
+Jack.Client client;
 unowned Jack.Port master_l;
 unowned Jack.Port master_r;
 unowned Jack.Port input_port;
@@ -73,7 +73,7 @@ public int ProcessCallback(Jack.NFrames nframes)
 	}
 	
 	percentComplete = recordSample.get_complete();
-	stdout.printf("%f\t%s\n" , percentComplete,(record)?"ON":"OFF");
+	//stdout.printf("%f\t%s\n" , percentComplete,(record)?"ON":"OFF");
 	
 	recView.set_complete(percentComplete); // waveView update "line"
 	
@@ -154,15 +154,12 @@ public int main(string[] args)
 	recView.set_sample( recordSample.get_sample() );
 	
 	window.add(vbox);
-	
 	vbox.add(sampleBox);
-	
 	sampleBox.add(recView);
 	
 	vbox.add(slider);
 	vbox.add(playRecButton);
 	vbox.add(recordButton);
-	
 	
 	window.set_default_size(300,120);
 	window.show_all();
@@ -171,14 +168,33 @@ public int main(string[] args)
 	window.destroy.connect(Gtk.main_quit);
 	
 	// Set up JACK:
+	stdout.printf("Attempting to connect to JACK...\t\t\t");
 	Jack.Status status;
-	
-	stdout.printf("If I segfault right after this, start JACK and try me again\n");
 	client = Jack.Client.open("ValaClient",Jack.Options.NoStartServer, out status);
 	uint32 bufSize = 0;
 	
-	if (client == null)
-		stdout.printf("Client == null");
+	while (client == null) // loop to check JACK is running
+	{
+		stdout.printf("Failed.\n");
+		var dialog = new Gtk.MessageDialog (new Gtk.Window(), Gtk.DialogFlags.DESTROY_WITH_PARENT | Gtk.DialogFlags.MODAL, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK_CANCEL, ("JACK server is not started, will I start it for you?"));
+		var response = dialog.run();
+		
+		if ( response == Gtk.ResponseType.OK )
+		{
+			stdout.printf("Attempting to connect to JACK...\t\t\t");
+			// Start JACK server, will hop out of loop if opened successfully
+			client = Jack.Client.open("ValaClient",Jack.Options.NullOption, out status);
+			dialog.destroy();
+		}
+		else
+		{
+			stdout.printf("Quitting now.\n");
+			dialog.destroy();
+			return -1; // quit program
+		}
+	}
+	
+	stdout.printf("Done!\n"); // connected to JACK
 	
 	// will segFault here if JACK is not running...
 	bufSize = client.get_buffer_size();

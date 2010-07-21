@@ -2,7 +2,6 @@ namespace Audio
 {
 	public class Sample
 	{
-		private bool queToggleRecord;
 		private int index;
 		private float[] array;
 		private SndFile.File file;
@@ -30,17 +29,6 @@ namespace Audio
 			this.index = this.array.length = (int)info.frames; // keep array.length in int
 			return true;
 		}
-		
-		public void set_que_record(bool queRecord)
-		{
-			queToggleRecord = queRecord;
-		}
-		
-		public bool get_que_record()
-		{
-			return queToggleRecord;
-		}
-		
 		public float[] get_nframes(Jack.NFrames nframes) // nframe parameter
 		{
 			// create temp array

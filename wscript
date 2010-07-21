@@ -21,8 +21,8 @@ def configure(conf):
 	conf.check_tool('compiler_cc')
 	conf.check_tool('vala')
 	
-	conf.env.append_value('CFLAGS', ['-O2', '-g', '-Wall'])
-	conf.env.append_value('VALAFLAGS', '--thread')
+	conf.env.append_value('CFLAGS', ['-O2', '-g'])
+	conf.env.append_value('VALAFLAGS', '--thread -X -Wall')
 	
 	conf.check_cfg(package='glib-2.0', uselib_store='GLIB', atleast_version='2.10.0', mandatory=1, args='--cflags --libs')
 	conf.check_cfg(package='gtk+-2.0', uselib_store='GTK', atleast_version='2.10.0', mandatory=1, args='--cflags --libs')

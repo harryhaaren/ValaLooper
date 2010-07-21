@@ -51,10 +51,14 @@ namespace Widget
 			int width = event.area.width;
 			int height= event.area.height;
 			
-			cr.set_source_rgb(0.0,0.2,1.0);
+			unowned Gtk.Style style = this.get_style();
+			
+			// color.<x>  is a uint16: divide by 65535.0 to get 0-1 range
+			Gdk.Color color = style.bg[0];
+			
+			cr.set_source_rgb(color.red/65535.0, color.green/65535.0, color.blue/65535.0);
 			
 			float currentSample = height/2; // should be dead center
-			
 			
 			
 			for (int i = 0; i < this.array.length; i += 20)
