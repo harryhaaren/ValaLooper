@@ -1,6 +1,6 @@
 
-using Audio;
-using Widget;
+using Gui;		// contains all GUI classes
+using Audio;	// contains all Engine classes
 
 namespace Audio
 {
@@ -31,46 +31,24 @@ namespace Audio
 	}
 }
 
+public void callbackHere()
+{
+	stdout.printf("In addSampler callback");
+}
+
 public int main(string[] args)
 {
+	// Initialize GTK
 	Gtk.init(ref args);
 	
-	// creating checks if JACK server running
-	JackClient client = new JackClient();
-	
-	Sample recordSample;
-	
-	// load samples into "Sample" objects (init objects first)
-	recordSample = new Sample();
-	recordSample.clear();
+	// create engine here, will setup up JACK & Mixer objects
+	Audio.Engine engine = new Audio.Engine();
 	
 	// Set up GTK
-	var window = new Gtk.Window(Gtk.WindowType.TOPLEVEL);
-	var vbox   = new Gtk.VBox(false,5);
-	var sampleBox   = new Gtk.HBox(true,5);
-	var slider = new Gtk.HScale.with_range (0, 1.5, 0.001);
+	Gui.MainWindow mainWin = new Gui.MainWindow();
 	
-	//slider.value_changed.connect(null);
-	
-	var playRecButton = new Gtk.Button.with_label("Play Recording");
-	var recordButton = new Gtk.Button.with_label("Record");
-	
-	var recView = new WaveView();			// already declared
-	
-	recView.set_sample( recordSample.get_sample() );
-	
-	window.add(vbox);
-	vbox.add(sampleBox);
-	sampleBox.add(recView);
-	
-	vbox.add(slider);
-	vbox.add(playRecButton);
-	vbox.add(recordButton);
-	
-	window.set_default_size(300,120);
-	window.show_all();
-	// playRecButton.clicked.connect(<funcNameHere>);
-	window.destroy.connect(Gtk.main_quit);
+	// Connect signals from GUI to engine
+	mainWin.signal_addSampler.connect( engine.mixer.addSampler );
 	
 	// Run GTK
 	Gtk.main();

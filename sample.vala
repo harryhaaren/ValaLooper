@@ -6,10 +6,7 @@ namespace Audio
 		private float[] array;
 		private SndFile.File file;
 		
-		public Sample()
-		{
-			this.index = 0;
-		}
+		public Sample() {}
 		
 		public void play()
 		{
@@ -23,10 +20,10 @@ namespace Audio
 			this.file = SndFile.File.open(name,SndFile.FileMode.READ, out info);
 			
 			this.array = new float[info.frames];
-			//this.file.read_float( &this.array[0], info.frames);
+			this.file.read_float( &this.array[0], info.frames);
 			
 			stdout.printf("%s: %i\n", name , (int) info.frames);
-			this.index = this.array.length = (int)info.frames; // keep array.length in int
+			this.index = 0;
 			return true;
 		}
 		public float[] get_nframes(Jack.NFrames nframes) // nframe parameter
@@ -42,6 +39,16 @@ namespace Audio
 				this.index = 0;
 			
 			return tempArray;
+		}
+		
+		public float get_single_sample()
+		{
+			if ( this.index >= this.array.length )
+			{
+				this.index = 0;
+			}
+			
+			return this.array[this.index++];
 		}
 		
 		public float[] get_sample()

@@ -1,9 +1,15 @@
+
+// for dialog box's reporting JACK status
 using Gtk;
+
+// from C, to quit if jack isnt running
+extern void exit(int exitCode);
 
 namespace Audio
 {
 	public class JackClient
 	{
+		private Mixer*  mixer;
 		private uint32  bufferSize;
 		private Jack.Client client;
 		private Jack.Status status;
@@ -37,7 +43,7 @@ namespace Audio
 				{
 					stdout.printf("Quitting now.\n");
 					dialog.destroy();
-					// quit(0);
+					exit(-1);
 				}
 			}
 			
@@ -45,6 +51,11 @@ namespace Audio
 			client.set_process_callback(processCallback);
 			bufferSize = client.get_buffer_size();
 			stdout.printf("Done!\n"); // connected to JACK
+		}
+		
+		public void setMixer(Mixer* inMixer)
+		{
+			mixer = inMixer;
 		}
 		
 		~JackClient()
@@ -57,14 +68,17 @@ namespace Audio
 		{
 			// activate client
 			client.activate();
-			
+		}
+		
+		public void connectPorts()
+		{
 			// then connect ports
-			string[] ports = (string[]) client.get_ports("", "", Jack.Port.Flags.IsPhysical | Jack.Port.Flags.IsInput);
+			string[] ports = client.get_ports("", "", Jack.Port.Flags.IsPhysical | Jack.Port.Flags.IsInput);
 			client.connect(masterL.name() , ports[0]);
 			client.connect(masterR.name() , ports[1]);
 			
 			string[] outPorts = client.get_ports("", "", Jack.Port.Flags.IsPhysical | Jack.Port.Flags.IsOutput);
-			client.connect( outPorts[2], inputPort.name());
+			client.connect( outPorts[0], inputPort.name());
 		}
 		public void registerPorts()
 		{
@@ -76,22 +90,14 @@ namespace Audio
 		private int processCallback(Jack.NFrames nframes)
 		{
 			// get buffer data
-			var input    = (float*) inputPort.get_buffer(nframes);
+			var inputBuffer    = (float*) inputPort.get_buffer(nframes);
 			
 			// Output:
-			var buffer_l = (float*) masterL.get_buffer(nframes);
-			var buffer_r = (float*) masterR.get_buffer(nframes);
+			var outputBuffer = (float*) masterL.get_buffer(nframes);
+			//var buffer_r = (float*) masterR.get_buffer(nframes);
 			
-			
-			for(int i = 0; i < (uint32) nframes; i++)
-			{
-				float temp = 0;
-				
-				temp = (float) (input[i] * 1.5); // copy input to outputs
-				
-				buffer_l[i] = temp;
-				buffer_r[i] = temp;
-			}
+			// ask mixer to process: it also writes the data to the buffers
+			mixer->process(nframes,ref inputBuffer, ref outputBuffer);
 			
 			return 0;
 		}

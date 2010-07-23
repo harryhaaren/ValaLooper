@@ -1,4 +1,4 @@
-namespace Widget
+namespace Gui
 {
 	public class WaveView : Gtk.DrawingArea
 	{
@@ -16,7 +16,7 @@ namespace Widget
 			// Set favored widget size
 			set_size_request (100, 100);
 			
-			var time = new TimeoutSource(100);
+			var time = new TimeoutSource(250);
 			time.set_callback(() => { redraw(); return true; });
 			time.attach(null);
 		}
@@ -56,7 +56,9 @@ namespace Widget
 			// color.<x>  is a uint16: divide by 65535.0 to get 0-1 range
 			Gdk.Color color = style.bg[0];
 			
-			cr.set_source_rgb(color.red/65535.0, color.green/65535.0, color.blue/65535.0);
+			Gdk.cairo_set_source_color(cr,  color);
+			
+			//cr.set_source_rgb(color.red/65535.0, color.green/65535.0, color.blue/65535.0);
 			
 			float currentSample = height/2; // should be dead center
 			
