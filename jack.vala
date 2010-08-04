@@ -10,6 +10,7 @@ namespace Audio
 	public class JackClient
 	{
 		private Mixer*  mixer;
+
 		private uint32  bufferSize;
 		private Jack.Client client;
 		private Jack.Status status;
@@ -58,6 +59,8 @@ namespace Audio
 			mixer = inMixer;
 		}
 		
+
+		
 		~JackClient()
 		{
 			// Take down JACK
@@ -68,6 +71,11 @@ namespace Audio
 		{
 			// activate client
 			client.activate();
+		}
+		
+		public Jack.NFrames getSampleRate()
+		{
+			return client.get_sample_rate();
 		}
 		
 		public void connectPorts()
@@ -93,11 +101,13 @@ namespace Audio
 			var inputBuffer    = (float*) inputPort.get_buffer(nframes);
 			
 			// Output:
-			var outputBuffer = (float*) masterL.get_buffer(nframes);
-			//var buffer_r = (float*) masterR.get_buffer(nframes);
+			var outputBufferL = (float*) masterL.get_buffer(nframes);
+			var outputBufferR = (float*) masterR.get_buffer(nframes);
+			
+			var frameNum = client.get_current_transport_frame();
 			
 			// ask mixer to process: it also writes the data to the buffers
-			mixer->process(nframes,ref inputBuffer, ref outputBuffer);
+			mixer->process(frameNum, nframes,ref inputBuffer, ref outputBufferL, ref outputBufferR);
 			
 			return 0;
 		}

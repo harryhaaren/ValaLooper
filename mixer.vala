@@ -4,6 +4,7 @@ namespace Audio
 	public class Mixer
 	{
 		private Gee.ArrayList <Sample> sampleArray;
+		private Sequencer* sequencer;
 		
 		public Mixer()
 		{
@@ -15,6 +16,11 @@ namespace Audio
 			sampleArray.add(x);
 			
 			stdout.printf("Done!\n");
+		}
+		
+		public void setSequencer(Sequencer* inSequencer)
+		{
+			sequencer = inSequencer;
 		}
 		
 		~Mixer()
@@ -30,17 +36,18 @@ namespace Audio
 			stdout.printf("sampleArray.length: %i\n",sampleArray.size);
 		}
 		
-		public int process(Jack.NFrames nframes,ref float* inputBuffer,ref float* outputBuffer )
+		public int process(Jack.NFrames frameNum, Jack.NFrames nframes,ref float* inputBuffer,ref float* outputBufferL,ref float* outputBufferR )
 		{
 			float temp = 0;
 			
+			//stdout.printf("FrameNum: %u\n",(uint32)frameNum);
+			
+			// var sequencerData = 
+			sequencer->process(frameNum, nframes);
+			
 			for(int i = 0; i < (uint32) nframes; i++)
 			{
-				for (int sampleNum = 0; sampleNum < sampleArray.size-1; sampleNum++)
-				{
-					temp += sampleArray[sampleNum].get_single_sample();
-				}
-				outputBuffer[i] = temp;
+				
 			}
 			
 			return 0;

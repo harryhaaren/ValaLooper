@@ -50,11 +50,20 @@ def build(bld):
 	
 	bld.new_task_gen(
 		features = 'cc cstaticlib',
+		#packages = 'jack gtk+-2.0',
+		target = 'sequencer',
+		source = 'sequencer.vala',
+		#uselib = '',
+		uselib_local = '',
+		)
+	
+	bld.new_task_gen(
+		features = 'cc cstaticlib',
 		packages = 'jack gee-1.0',
 		target = 'mixer',
 		source = 'mixer.vala',
 		uselib = 'JACK GEE',
-		uselib_local = 'sample waveview')
+		uselib_local = 'sample waveview sequencer')
 	
 	bld.new_task_gen(
 		features = 'cc cstaticlib',

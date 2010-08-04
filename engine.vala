@@ -3,8 +3,10 @@ namespace Audio
 {
 	public class Engine
 	{
-		public Mixer		mixer;
+		private int bpm;
+		public  Mixer		mixer;
 		private JackClient	jackClient;
+		private Sequencer	sequencer;
 		
 		public Engine()
 		{
@@ -14,14 +16,27 @@ namespace Audio
 			jackClient.setMixer(mixer);
 			jackClient.registerPorts();
 			jackClient.activate();
-			stdout.printf("Engine running!\n");
 			
-			// segfaults, something with jack_port_name, compiler issues warnings.
-			//jackClient.connectPorts();
+			uint32 sampleRate = jackClient.getSampleRate();
+			
+			bpm = 120;
+			
+			stdout.printf("Engine BPM:%i\n", bpm);
+			
+			sequencer = new Sequencer(sampleRate,bpm);
+			mixer.setSequencer(sequencer); // after jack is activated... :-(
+			
+			
+			stdout.printf("Engine Sample rate:%u\n",(uint32)sampleRate);
+			
+			jackClient.connectPorts();
+			
+			stdout.printf("Engine running!\n");
 		}
 		
 		~Engine()
 		{
+			
 		}
-	} // class Jack
+	} // class Engine
 }
