@@ -43,6 +43,9 @@ namespace Audio
 			stdout.printf("Engine running!\n");
 		}
 		
+		public void startTransport() { jackClient.startTransport(); }
+		public void stopTransport () { jackClient.stopTransport() ; }
+		
 		~Engine()
 		{
 			

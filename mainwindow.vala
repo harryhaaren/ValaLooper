@@ -5,6 +5,8 @@ namespace Gui
 	{
 		// public signals
 		public signal void signal_addSampler(); // definition of the signal
+		public signal void signal_startTransport(); // definition of the signal
+		public signal void signal_stopTransport(); // definition of the signal
 		
 		// private attributes
 		private Gtk.Window	window;
@@ -24,6 +26,14 @@ namespace Gui
 			
 			var button = new Gtk.Button.with_label("Add");
 			button.clicked.connect( () => { addSampler(); } );
+			menuBox.add(button);
+			
+			button = new Gtk.Button.with_label("Start");
+			button.clicked.connect( () => { signal_startTransport(); } );
+			menuBox.add(button);
+			
+			button = new Gtk.Button.with_label("Stop");
+			button.clicked.connect( () => { signal_stopTransport(); } );
 			menuBox.add(button);
 			
 			button = new Gtk.Button.with_label("Quit");

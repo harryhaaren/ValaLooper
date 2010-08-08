@@ -59,7 +59,8 @@ namespace Audio
 			mixer = inMixer;
 		}
 		
-
+		public void startTransport() { client.transport_start(); }
+		public void stopTransport()  { client.transport_stop();  }
 		
 		~JackClient()
 		{

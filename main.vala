@@ -47,6 +47,9 @@ public int main(string[] args)
 	// Set up GTK
 	Gui.MainWindow mainWin = new Gui.MainWindow();
 	
+	mainWin.signal_startTransport.connect(engine.startTransport);
+	mainWin.signal_stopTransport.connect (engine.stopTransport );
+	
 	// Connect signals from GUI to engine
 	mainWin.signal_addSampler.connect( engine.mixer.addSampler );
 	
