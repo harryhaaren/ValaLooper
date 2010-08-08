@@ -106,8 +106,24 @@ namespace Audio
 			
 			var frameNum = client.get_current_transport_frame();
 			
-			// ask mixer to process: it also writes the data to the buffers
-			mixer->process(frameNum, nframes,ref inputBuffer, ref outputBufferL, ref outputBufferR);
+			Jack.Position pos;
+			Jack.TransportState x = client.transport_query(out pos);
+			
+			if ( x == Jack.TransportState.Rolling)
+			{
+				// ask mixer to process: it also writes the data to the buffers
+				mixer->process(frameNum, nframes,ref inputBuffer, ref outputBufferL, ref outputBufferR);
+			}
+			else // fill buffers with 0
+			{
+				float temp = (float) 0.0;
+				
+				for (int i = 0; i < (int) nframes; i++)
+				{
+					*outputBufferL = temp;
+					*outputBufferR = temp;
+				}
+			}
 			
 			return 0;
 		}

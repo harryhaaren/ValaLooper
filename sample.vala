@@ -8,7 +8,11 @@ namespace Audio
 		
 		public Sample() {}
 		
-		public void play()
+		public void play(int sampleNum) // for "sampler" class.. HACK!
+		{
+			this.index = 0;
+		}
+		public void play_()
 		{
 			this.index = 0;
 		}
@@ -23,20 +27,21 @@ namespace Audio
 			this.file.read_float( &this.array[0], info.frames);
 			
 			stdout.printf("%s: %i\n", name , (int) info.frames);
-			this.index = 0;
+			this.index = (int)info.frames;
 			return true;
 		}
 		public float[] get_nframes(Jack.NFrames nframes) // nframe parameter
 		{
 			// create temp array
-			float[] tempArray = new float[ (int)nframes ];
+			float[] tempArray = new float[ (uint32)nframes ];
 			
 			// copy contents of real array @ index to tempArray
 			for ( int tempIndex =0 ; this.index < this.array.length && tempIndex < (int) nframes; this.index++)
 				tempArray[tempIndex++] = this.array[this.index] ;
 			
-			if ( this.index >= this.array.length )
-				this.index = 0;
+			
+			// Loops sample
+			//if ( this.index >= this.array.length ) {	this.index = 0; }
 			
 			return tempArray;
 		}
