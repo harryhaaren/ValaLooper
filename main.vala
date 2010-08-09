@@ -50,6 +50,8 @@ public int main(string[] args)
 	mainWin.signal_startTransport.connect(engine.startTransport);
 	mainWin.signal_stopTransport.connect (engine.stopTransport );
 	
+	//mainWin.signal_updateBpm.connect (engine.updateBpm );
+	
 	// Connect signals from GUI to engine
 	mainWin.signal_addSampler.connect( engine.mixer.addSampler );
 	

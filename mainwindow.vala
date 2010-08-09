@@ -8,6 +8,8 @@ namespace Gui
 		public signal void signal_startTransport(); // definition of the signal
 		public signal void signal_stopTransport(); // definition of the signal
 		
+		public signal void signal_updateBpm(int inBpm); // definition of the signal
+		
 		// private attributes
 		private Gtk.Window	window;
 		private Gtk.VBox	mainBox;
@@ -21,6 +23,10 @@ namespace Gui
 			mainBox = new Gtk.VBox(false,0);
 			menuBox = new Gtk.HBox(false,0);
 			window.add(mainBox);
+			
+			// var slider = new Gtk.HScale.with_range (60,200, 5);
+			// slider.value_changed.connect( () => { signal_updateBpm( (int)slider.get_value() ); });
+			// mainBox.add(slider);
 			
 			mainBox.add(menuBox);
 			

@@ -24,16 +24,16 @@ namespace Audio
 			
 			uint32 sampleRate = jackClient.getSampleRate();
 			
-			bpm = 166;
+			bpm = 120;
 			
 			stdout.printf("Engine BPM:%i\n", bpm);
 			
 			sequencer = new Sequencer(sampleRate,bpm);
 			sequencer.signal_playSample.connect(sample.play);
 			
-			mixer.setSequencer(sequencer); // after jack is activated... :-(
+			jackClient.setSequencer(sequencer); // after jack is activated... :-(
 			
-			mixer.setSample(sample); // after jack is activated... :-(
+			mixer.setSample(sample); // we should be adding a "samplER" not a sampl"e" here.
 			
 			
 			stdout.printf("Engine Sample rate:%u\n",(uint32)sampleRate);
@@ -45,6 +45,7 @@ namespace Audio
 		
 		public void startTransport() { jackClient.startTransport(); }
 		public void stopTransport () { jackClient.stopTransport() ; }
+		//public void updateBpm (int inBpm) { sequencer.updateBpm(bpm); }
 		
 		~Engine()
 		{

@@ -10,13 +10,17 @@ namespace Audio
 	public class JackClient
 	{
 		private Mixer*  mixer;
-
+		private Sequencer* sequencer;
+		
 		private uint32  bufferSize;
 		private Jack.Client client;
 		private Jack.Status status;
 		private unowned Jack.Port masterL;
 		private unowned Jack.Port masterR;
 		private unowned Jack.Port inputPort;
+		
+		private unowned Jack.Port midiInputPort;
+		private unowned Jack.Port midiOutputPort;
 		
 		public JackClient()
 		{
@@ -59,6 +63,11 @@ namespace Audio
 			mixer = inMixer;
 		}
 		
+		public void setSequencer(Sequencer* inSequencer)
+		{
+			sequencer = inSequencer;
+		}
+		
 		public void startTransport() { client.transport_start(); }
 		public void stopTransport()  { client.transport_stop();  }
 		
@@ -94,26 +103,34 @@ namespace Audio
 			masterL = client.port_register("master_out_L", Jack.DEFAULT_AUDIO_TYPE, Jack.Port.Flags.IsOutput, bufferSize);
 			masterR = client.port_register("master_out_R", Jack.DEFAULT_AUDIO_TYPE, Jack.Port.Flags.IsOutput, bufferSize);
 			inputPort = client.port_register("inputPort", Jack.DEFAULT_AUDIO_TYPE, Jack.Port.Flags.IsInput, bufferSize);
+			
+			midiInputPort  = client.port_register("midiInputPort", Jack.DEFAULT_MIDI_TYPE, Jack.Port.Flags.IsInput, bufferSize);
+			midiOutputPort = client.port_register("midiOutputPort", Jack.DEFAULT_MIDI_TYPE, Jack.Port.Flags.IsOutput, bufferSize);
 		}
 		
 		private int processCallback(Jack.NFrames nframes)
 		{
-			// get buffer data
+			// get input buffers
 			var inputBuffer    = (float*) inputPort.get_buffer(nframes);
+			var midiInputBuffer= (char* ) midiInputPort.get_buffer(nframes);
 			
-			// Output:
+			// get output buffers
 			var outputBufferL = (float*) masterL.get_buffer(nframes);
 			var outputBufferR = (float*) masterR.get_buffer(nframes);
+			var midiOutputPort= (char* ) masterR.get_buffer(nframes);
 			
 			var frameNum = client.get_current_transport_frame();
 			
 			Jack.Position pos;
 			Jack.TransportState x = client.transport_query(out pos);
 			
-			if ( x == Jack.TransportState.Rolling)
+			if ( x == Jack.TransportState.Rolling) // currently playing
 			{
+				// ask sequencer to process: it sends signals to other parts of the engine
+				sequencer	->	process(frameNum, nframes);
+				
 				// ask mixer to process: it also writes the data to the buffers
-				mixer->process(frameNum, nframes,ref inputBuffer, ref outputBufferL, ref outputBufferR);
+				mixer		->	process(frameNum, nframes,ref inputBuffer, ref outputBufferL, ref outputBufferR);
 			}
 			else // fill buffers with 0
 			{
@@ -121,6 +138,8 @@ namespace Audio
 				
 				for (int i = 0; i < (int) nframes; i++)
 				{
+					//*midiOutputPort = midiInputPort
+					
 					*outputBufferL = temp;
 					*outputBufferR = temp;
 				}
