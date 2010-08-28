@@ -6,7 +6,11 @@ namespace Audio
 		private float[] array;
 		private SndFile.File file;
 		
-		public Sample() {}
+		public Sample()
+		{
+			this.array = new float[1];
+			this.array[0] = (float)0.0;
+		}
 		
 		public void play(int sampleNum) // for "sampler" class.. HACK!
 		{
@@ -48,7 +52,12 @@ namespace Audio
 		
 		public float get_single_sample()
 		{
-			if ( this.index >= this.array.length )
+			if (this.array.length == 0) // no sample loaded, so CANNOT access buffer without segfault
+			{
+				return (float) 0.0;
+			}
+			
+			if ( this.index >= this.array.length ) // check bounds of sample & loop
 			{
 				this.index = 0;
 			}

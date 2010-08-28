@@ -93,7 +93,7 @@ namespace Gui
 			
 			if (array.length == 0)
 			{
-				array = { (float)0.5}; // otherwise there's a % by 0 segfault
+				array = { (float)0.5 }; // otherwise there's a / by 0 segfault
 			}
 		}
 		

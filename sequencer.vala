@@ -11,8 +11,6 @@ namespace Audio
 		
 		public signal void signal_playSample(int x);
 		
-		private uint32 currentSampleNum;
-		
 		public Sequencer(uint32 inSampleRate, int inBpm)
 		{
 			if (inBpm == 0)
@@ -37,14 +35,13 @@ namespace Audio
 		public void process( uint32 frameNum, uint32 frames )
 		{
 			uint32 oldModulus = 0;
-			bool beat = false;
+			
 			for (uint32 i = 0; i < frames; i++)
 			{
 				if ( (frameNum + i) % samplesPerBeat == 0)
 				{
-					beat = true;
-					signal_playSample(0);
 					stdout.printf("Beat: %i\n",beatsDone++);
+					signal_playSample(0);
 				}
 				//stdout.printf("%u\t%u\n",oldModulus,frameNum);
 				oldModulus = frameNum + i % samplesPerBeat;

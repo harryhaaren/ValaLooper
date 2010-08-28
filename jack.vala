@@ -112,12 +112,12 @@ namespace Audio
 		{
 			// get input buffers
 			var inputBuffer    = (float*) inputPort.get_buffer(nframes);
-			var midiInputBuffer= (char* ) midiInputPort.get_buffer(nframes);
+			var midiInputBuffer= midiInputPort.get_buffer(nframes);
 			
 			// get output buffers
 			var outputBufferL = (float*) masterL.get_buffer(nframes);
 			var outputBufferR = (float*) masterR.get_buffer(nframes);
-			var midiOutputPort= (char* ) masterR.get_buffer(nframes);
+			var midiOutputPort= masterR.get_buffer(nframes);
 			
 			var frameNum = client.get_current_transport_frame();
 			
@@ -132,14 +132,16 @@ namespace Audio
 				// ask mixer to process: it also writes the data to the buffers
 				mixer		->	process(frameNum, nframes,ref inputBuffer, ref outputBufferL, ref outputBufferR);
 			}
-			else // fill buffers with 0
+			else // fill audio buffers with 0, 
 			{
-				float temp = (float) 0.0;
-				
+				// pass trough MIDI events
 				for (int i = 0; i < (int) nframes; i++)
 				{
-					//*midiOutputPort = midiInputPort
+					// after cycling trough events, clear the buffer
+					Jack.Midi.clear_buffer(midiInputBuffer);
 					
+					// fill output buffers with 0
+					float temp = (float) 0.0;
 					*outputBufferL = temp;
 					*outputBufferR = temp;
 				}
